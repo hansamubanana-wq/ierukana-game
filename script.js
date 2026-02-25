@@ -1,74 +1,9 @@
-// Game Data Database (Multiple Topics)
-const topicDatabase = [
-    {
-        id: "prefectures",
-        title: "日本の都道府県",
-        answers: [
-            ["北海道", "ほっかいどう"], ["青森県", "あおもりけん", "青森", "あおもり"], ["岩手県", "いわてけん", "岩手", "いわて"],
-            ["宮城県", "みやぎけん", "宮城", "みやぎ"], ["秋田県", "あきたけん", "秋田", "あきた"], ["山形県", "やまがたけん", "山形", "やまがた"],
-            ["福島県", "ふくしまけん", "福島", "ふくしま"], ["茨城県", "いばらきけん", "茨城", "いばらき"], ["栃木県", "とちぎけん", "栃木", "とちぎ"],
-            ["群馬県", "ぐんまけん", "群馬", "ぐんま"], ["埼玉県", "さいたまけん", "埼玉", "さいたま"], ["千葉県", "ちばけん", "千葉", "ちば"],
-            ["東京都", "とうきょうと", "東京", "とうきょう"], ["神奈川県", "かながわけん", "神奈川", "かながわ"], ["新潟県", "にいがたけん", "新潟", "にいがた"],
-            ["富山県", "とやまけん", "富山", "とやま"], ["石川県", "いしかわけん", "石川", "いしかわ"], ["福井県", "ふくいけん", "福井", "ふくい"],
-            ["山梨県", "やまなしけん", "山梨", "やまなし"], ["長野県", "ながのけん", "長野", "ながの"], ["岐阜県", "ぎふけん", "岐阜", "ぎふ"],
-            ["静岡県", "しずおかけん", "静岡", "しずおか"], ["愛知県", "あいちけん", "愛知", "あいち"], ["三重県", "みえけん", "三重", "みえ"],
-            ["滋賀県", "しがけん", "滋賀", "しが"], ["京都府", "きょうとふ", "京都", "きょうと"], ["大阪府", "おおさかふ", "大阪", "おおさか"],
-            ["兵庫県", "ひょうごけん", "兵庫", "ひょうご"], ["奈良県", "ならけん", "奈良", "なら"], ["和歌山県", "わかやまけん", "和歌山", "わかやま"],
-            ["鳥取県", "とっとりけん", "鳥取", "とっとり"], ["島根県", "しまねけん", "島根", "しまね"], ["岡山県", "おかやまけん", "岡山", "おかやま"],
-            ["広島県", "ひろしまけん", "広島", "ひろしま"], ["山口県", "やまぐちけん", "山口", "やまぐち"], ["徳島県", "とくしまけん", "徳島", "とくしま"],
-            ["香川県", "かがわけん", "香川", "かがわ"], ["愛媛県", "えひめけん", "愛媛", "えひめ"], ["高知県", "こうちけん", "高知", "こうち"],
-            ["福岡県", "ふくおかけん", "福岡", "ふくおか"], ["佐賀県", "さがけん", "佐賀", "さが"], ["長崎県", "ながさきけん", "長崎", "ながさき"],
-            ["熊本県", "くまもとけん", "熊本", "くまもと"], ["大分県", "おおいたけん", "大分", "おおいた"], ["宮崎県", "みやざきけん", "宮崎", "みやざき"],
-            ["鹿児島県", "かごしまけん", "鹿児島", "かごしま"], ["沖縄県", "おきなわけん", "沖縄", "おきなわ"]
-        ]
-    },
-    {
-        id: "ghibli",
-        title: "スタジオジブリ 長編映画",
-        answers: [
-            ["天空の城ラピュタ", "てんくうのしろらぴゅた", "ラピュタ", "らぴゅた"],
-            ["となりのトトロ", "となりのととろ", "トトロ", "ととろ"],
-            ["火垂るの墓", "ほたるのはか"],
-            ["魔女の宅急便", "まじょのたっきゅうびん"],
-            ["おもひでぽろぽろ", "おもいでぽろぽろ"],
-            ["紅の豚", "くれないのぶた"],
-            ["平成狸合戦ぽんぽこ", "へいせいたぬきがっせんぽんぽこ", "ぽんぽこ"],
-            ["耳をすませば", "みみをすませば"],
-            ["もののけ姫", "もののけひめ"],
-            ["ホーホケキョ となりの山田くん", "ほーほけきょとなりのやまだくん", "となりの山田くん", "となりのやまだくん"],
-            ["千と千尋の神隠し", "せんとちひろのかみかくし", "千と千尋", "せんとちひろ"],
-            ["猫の恩返し", "ねこのおんがえし"],
-            ["ハウルの動く城", "はうるのうごくしろ", "ハウル", "はうる"],
-            ["ゲド戦記", "げどせんき"],
-            ["崖の上のポニョ", "がけのうえのぽにょ", "ポニョ", "ぽにょ"],
-            ["借りぐらしのアリエッティ", "かりぐらしのありえってぃ", "アリエッティ", "ありえってぃ"],
-            ["コクリコ坂から", "こくりこざかから"],
-            ["風立ちぬ", "かぜたちぬ"],
-            ["かぐや姫の物語", "かぐやひめのものがたり"],
-            ["思い出のマーニー", "おもいでのまーにー", "マーニー", "まーにー"],
-            ["君たちはどう生きるか", "きみたちはどういきるか"]
-        ]
-    },
-    {
-        id: "pokemon-gen1-starters",
-        title: "初代ポケモン 御三家進化系",
-        answers: [
-            ["フシギダネ", "ふしぎだね"], ["フシギソウ", "ふしぎそう"], ["フシギバナ", "ふしぎばな"],
-            ["ヒトカゲ", "ひとかげ"], ["リザード", "りざーど"], ["リザードン", "りざーどん"],
-            ["ゼニガメ", "ぜにがめ"], ["カメール", "かめーる"], ["カメックス", "かめっくす"]
-        ]
-    }
-];
-
 // Game State
 let currentData = null;
 let solvedIndices = new Set();
 let timerInterval = null;
 let startTime = 0;
 let isPlaying = false;
-
-// Data Storage Keys
-const CUSTOM_TOPICS_KEY = 'ierukana_custom_topics';
 
 // DOM Elements
 const portalView = document.getElementById('portal-view');
@@ -107,68 +42,64 @@ const cancelTopicBtn = document.getElementById('cancel-topic-btn');
 let pendingCustomAnswers = [];
 
 // Initialize Portal List
-function initPortal() {
+async function initPortal() {
     portalView.style.display = 'flex';
     gameView.style.display = 'none';
-    topicListEl.innerHTML = '';
+    topicListEl.innerHTML = '<p>読み込み中...</p>';
 
-    // Load Custom Topics
-    let customTopics = [];
     try {
-        const stored = localStorage.getItem(CUSTOM_TOPICS_KEY);
-        if (stored) customTopics = JSON.parse(stored);
-    } catch (e) {
-        console.error("Failed to parse custom topics", e);
-    }
+        const response = await fetch('/api/topics');
+        if (!response.ok) throw new Error('Failed to fetch topics');
+        const allTopics = await response.json();
 
-    const allTopics = [...topicDatabase, ...customTopics];
+        topicListEl.innerHTML = '';
+        allTopics.forEach(topic => {
+            const btn = document.createElement('div');
+            btn.className = 'topic-card';
 
-    allTopics.forEach(topic => {
-        const btn = document.createElement('div');
-        btn.className = 'topic-card';
+            // Setup Card HTML (with delete button if custom)
+            const isCustom = topic.id.startsWith('custom_');
+            btn.innerHTML = `
+                <div class="topic-card-header">
+                    <h3>${topic.title}</h3>
+                    ${isCustom ? `<button class="delete-topic-btn" data-id="${topic.id}">🗑️</button>` : ''}
+                </div>
+                <p>全 ${topic.answers.length} 問</p>
+            `;
 
-        // Setup Card HTML (with delete button if custom)
-        const isCustom = topic.id.startsWith('custom_');
-        btn.innerHTML = `
-            <div class="topic-card-header">
-                <h3>${topic.title}</h3>
-                ${isCustom ? `<button class="delete-topic-btn" data-id="${topic.id}">🗑️</button>` : ''}
-            </div>
-            <p>全 ${topic.answers.length} 問</p>
-        `;
-
-        // Click to play
-        btn.addEventListener('click', (e) => {
-            if (e.target.closest('.delete-topic-btn')) return; // handled separately
-            initGame(topic);
-        });
-
-        // Delete Logic
-        if (isCustom) {
-            const delBtn = btn.querySelector('.delete-topic-btn');
-            delBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (confirm(`「${topic.title}」を削除しますか？`)) {
-                    deleteCustomTopic(topic.id);
-                }
+            // Click to play
+            btn.addEventListener('click', (e) => {
+                if (e.target.closest('.delete-topic-btn')) return; // handled separately
+                initGame(topic);
             });
-        }
 
-        topicListEl.appendChild(btn);
-    });
+            // Delete Logic
+            if (isCustom) {
+                const delBtn = btn.querySelector('.delete-topic-btn');
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm(`「${topic.title}」を削除しますか？`)) {
+                        deleteCustomTopic(topic.id);
+                    }
+                });
+            }
+
+            topicListEl.appendChild(btn);
+        });
+    } catch (e) {
+        console.error("Failed to load topics", e);
+        topicListEl.innerHTML = '<p class="error-text">お題の読み込みに失敗しました。サーバーが起動しているか確認してください。</p>';
+    }
 }
 
-function deleteCustomTopic(id) {
+async function deleteCustomTopic(id) {
     try {
-        const stored = localStorage.getItem(CUSTOM_TOPICS_KEY);
-        if (stored) {
-            let customTopics = JSON.parse(stored);
-            customTopics = customTopics.filter(t => t.id !== id);
-            localStorage.setItem(CUSTOM_TOPICS_KEY, JSON.stringify(customTopics));
-            initPortal(); // Refresh UI
-        }
+        const response = await fetch(`/api/topics/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete topic');
+        initPortal(); // Refresh UI
     } catch (e) {
-        console.error("Failed to delete custom topic", e);
+        console.error("Failed to delete topic", e);
+        alert('削除に失敗しました。');
     }
 }
 
@@ -392,15 +323,20 @@ function renderPendingItems() {
     });
 }
 
-saveTopicBtn.addEventListener('click', () => {
+saveTopicBtn.addEventListener('click', async () => {
+    saveTopicBtn.disabled = true;
+    createTopicError.textContent = '保存中...';
+
     const title = newTopicTitle.value.trim();
     if (!title) {
         createTopicError.textContent = 'エラー: お題のタイトルを入力してください';
+        saveTopicBtn.disabled = false;
         newTopicTitle.focus();
         return;
     }
     if (pendingCustomAnswers.length === 0) {
         createTopicError.textContent = 'エラー: 少なくとも1つの答えを追加してください';
+        saveTopicBtn.disabled = false;
         newTopicItem.focus();
         return;
     }
@@ -412,21 +348,22 @@ saveTopicBtn.addEventListener('click', () => {
     };
 
     try {
-        let customTopics = [];
-        const stored = localStorage.getItem(CUSTOM_TOPICS_KEY);
-        if (stored) {
-            customTopics = JSON.parse(stored);
-        }
-        customTopics.push(newTopic);
-        localStorage.setItem(CUSTOM_TOPICS_KEY, JSON.stringify(customTopics));
+        const response = await fetch('/api/topics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTopic)
+        });
+
+        if (!response.ok) throw new Error('Failed to save topic');
 
         createTopicModal.classList.remove('active');
         initPortal(); // Refresh List
     } catch (e) {
-        createTopicError.textContent = 'エラー: 保存に失敗しました（保存容量の制限等）';
+        createTopicError.textContent = 'エラー: 保存に失敗しました（サーバー通信エラー等）';
         console.error(e);
+    } finally {
+        saveTopicBtn.disabled = false;
     }
 });
-
 // Start initially with the portal screen
 initPortal();
