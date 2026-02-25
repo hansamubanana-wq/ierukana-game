@@ -10,7 +10,8 @@ async function getTopics() {
         // If we can't read, we'll try to return empty so at least it doesn't 500.
         const { blobs } = await list({ maxResults: 1, prefix: STORE_NAME, token });
         if (blobs.length > 0) {
-            const response = await fetch(blobs[0].url);
+            // Vercel's Node.js fetch caches aggressively by default, so we force no-store
+            const response = await fetch(blobs[0].url, { cache: 'no-store' });
             return await response.json();
         }
         return [];

@@ -48,7 +48,8 @@ async function initPortal() {
     topicListEl.innerHTML = '<p>読み込み中...</p>';
 
     try {
-        const response = await fetch('/api/topics');
+        // Force the browser to fetch the latest version and never cache the result
+        const response = await fetch('/api/topics?_t=' + Date.now(), { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to fetch topics');
         const allTopics = await response.json();
 
