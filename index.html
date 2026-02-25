@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>言えるかな？ゲーム</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="game-header">
+        <img src="assets/header.png" alt="Header Illustration" class="header-image">
+        <h1>言えるかな？ゲーム</h1>
+        <p class="subtitle" id="topic-title">お題を選んでね！</p>
+    </header>
+
+    <!-- Portal Display -->
+    <main id="portal-view" class="portal-container">
+        <h2>お題一覧（ポータル）</h2>
+        <p>遊びたいお題をクリックしてスタート！</p>
+        <div id="topic-list" class="topic-grid">
+            <!-- Topic Cards injected here -->
+        </div>
+        <div class="portal-actions">
+            <button id="open-create-modal-btn" class="btn btn-secondary btn-full">＋ 新しいお題を作る</button>
+        </div>
+    </main>
+
+    <!-- Main Game Display -->
+    <main id="game-view" class="game-container" style="display: none;">
+        <div class="status-bar">
+            <div class="time-box">
+                <span class="label">タイム</span>
+                <span class="value" id="time-display">00:00.00</span>
+            </div>
+            <div class="score-box">
+                <span class="label">正解数</span>
+                <span class="value" id="score-display">0 / 0</span>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="answer-input" placeholder="ここに入力してね！" autocomplete="off" disabled>
+        </div>
+
+        <div class="actions">
+            <button id="giveup-btn" class="btn btn-secondary" disabled>ギブアップ</button>
+            <button class="btn btn-text back-to-portal-btn">← 一覧に戻る</button>
+        </div>
+
+        <div class="answers-container">
+            <div id="answers-grid" class="answers-grid">
+                <!-- Answer items will be injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Start Modal -->
+    <div id="start-modal" class="modal active">
+        <div class="modal-content">
+            <h2>準備はいい？</h2>
+            <p id="start-topic-desc">お題：都道府県 (47個)</p>
+            <p>※漢字、ひらがな、どちらでも正解になるよ！（※データ作成者によります）</p>
+            <button id="start-btn" class="btn btn-primary btn-large">ゲームスタート！</button>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="result-title">タイムアップ！</h2>
+            <div class="result-score">
+                <span class="result-number" id="result-score">0</span>
+                <span class="result-total" id="result-total">/ 0</span>
+            </div>
+            <p id="result-message">がんばったね！</p>
+            <div class="result-actions">
+                <button id="retry-btn" class="btn btn-primary btn-full">もう一度プレイ</button>
+                <button class="btn btn-secondary btn-full back-to-portal-btn">一覧に戻る</button>
+                <button id="close-result-btn" class="btn btn-text">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Topic Modal -->
+    <div id="create-topic-modal" class="modal">
+        <div class="modal-content">
+            <h2>新しいお題を作る</h2>
+            <p>タイトルと答えを入力しよう！エンターキーでどんどん答えを追加できるよ。</p>
+
+            <div class="create-topic-form">
+                <input type="text" id="new-topic-title" class="create-input" placeholder="お題のタイトル (例: 好きな果物)">
+
+                <div class="input-with-hint">
+                    <input type="text" id="new-topic-item" class="create-input" placeholder="答えを入力してEnterキーを押す">
+                    <span class="input-hint">Enterキーで追加</span>
+                </div>
+
+                <div class="added-items-container">
+                    <p class="items-label">追加された答え (<span id="new-topic-count">0</span>個):</p>
+                    <ul id="new-topic-item-list" class="item-tags">
+                        <!-- Items injected here -->
+                    </ul>
+                </div>
+            </div>
+
+            <p id="create-topic-error" class="error-text"></p>
+
+            <div class="result-actions" style="margin-top: 1.5rem;">
+                <button id="save-topic-btn" class="btn btn-primary btn-full">保存してポータルに追加</button>
+                <button id="cancel-topic-btn" class="btn btn-text">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
