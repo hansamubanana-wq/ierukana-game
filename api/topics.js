@@ -46,6 +46,11 @@ async function saveTopics(topicsData) {
 }
 
 export default async function handler(req, res) {
+    // Prevent caching deeply to allow real-time updates
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     // Enable CORS for flexibility
     res.setHeader('Access-Control-Allow-Credentials', true)
     res.setHeader('Access-Control-Allow-Origin', '*')
