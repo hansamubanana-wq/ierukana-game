@@ -6,21 +6,22 @@ const STORE_NAME = 'topics.json';
 async function getTopics() {
     try {
         const token = process.env.BLOB_READ_WRITE_TOKEN;
-        // In local Vercel dev on some Windows machines, reading from Blob fails or crashes.
-        // If we can't read, we'll try to return empty so at least it doesn't 500.
         const { blobs } = await list({ maxResults: 1, prefix: STORE_NAME, token });
         if (blobs.length > 0) {
-            // Vercel's Node.js fetch caches aggressively by default, so we force no-store
-            const response = await fetch(blobs[0].url, { cache: 'no-store' });
+            // Bypass Vercel Edge CDN cache by appending a timestamp
+            const response = await fetch(blobs[0].url + '?_t=' + Date.now(), {
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+            });
+            if (!response.ok) throw new Error('Failed to fetch blob content from URL');
             return await response.json();
         }
         return [];
     } catch (error) {
-        console.warn('Warning: Could not read from Vercel Blob (might be local dev environment issue):', error.message);
-        // Fallback for local dev if blob is inaccessible
-        return [
-            { id: "prefectures", title: "日本の都道府県 (Fallback)", answers: [["北海道", "ほっかいどう"]] }
-        ];
+        console.error('Critical Error in getTopics:', error.message);
+        // Do NOT return a fallback array here in production. 
+        // Returning a fallback causes POST/DELETE to accidentally overwrite the entire database with the fallback data!
+        throw error;
     }
 }
 
