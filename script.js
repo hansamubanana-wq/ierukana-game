@@ -94,7 +94,7 @@ async function initPortal() {
 
 async function deleteCustomTopic(id) {
     try {
-        const response = await fetch(`/api/topics/${id}`, { method: 'DELETE' });
+        const response = await fetch(`/api/topics?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to delete topic');
         initPortal(); // Refresh UI
     } catch (e) {
