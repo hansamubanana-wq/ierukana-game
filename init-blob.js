@@ -11,7 +11,8 @@ async function initBlob() {
         console.log('Uploading initial topics.json to Vercel Blob...');
         const result = await put('topics.json', topicsData, {
             access: 'public',
-            addRandomSuffix: false
+            addRandomSuffix: false,
+            allowOverwrite: true
         });
         console.log('Successfully uploaded topics.json to:', result.url);
     } catch (error) {

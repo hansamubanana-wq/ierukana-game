@@ -30,6 +30,7 @@ async function saveTopics(topicsData) {
         await put(STORE_NAME, JSON.stringify(topicsData), {
             access: 'public',
             addRandomSuffix: false,
+            allowOverwrite: true,
             token
         });
     } catch (error) {
