@@ -40,6 +40,8 @@ JSONの厳密なフォーマット:
      例: 「青森県」の場合は、別解に「あおもり」「青森」を含める。
   2. 同じ意味の違う言葉（リンゴとアップルなど）も別解に含めてください。
   3. 別解要素はいくつあっても構いません（無い場合は要素なしでOK）。
+- 最後の要素のケツカンマ（trailing comma）は絶対に書かないでください。JSONとしてパースできなくなります。
+- 出力が途中で途切れるとエラーになるため、配列は必ず ] と } で完全に閉じて完了させてください。
 - 出力は純粋なJSON文字列のみを行ってください。マークダウンの \`\`\`json などの修飾は絶対に含めないでください。波括弧 {} で始まり波括弧で終わる必要があります。`;
 
     try {
@@ -70,8 +72,26 @@ JSONの厳密なフォーマット:
         }
 
         // Clean up markdown block if the model ignores the instruction
-        const jsonString = candidate.replace(/^```json/g, '').replace(/```$/g, '').trim();
-        const parsedData = JSON.parse(jsonString);
+        let jsonString = candidate.replace(/^```json/g, '').replace(/```$/g, '').trim();
+
+        // Final fallback: if the string ends abruptly before closing tags, try to soft-close it (rudimentary)
+        if (!jsonString.endsWith('}')) {
+            // Remove trailing commas if any, then close arrays/objects
+            jsonString = jsonString.replace(/,\s*$/g, '');
+            if (jsonString.lastIndexOf(']') > jsonString.lastIndexOf('[')) {
+                jsonString += "\n]}";
+            } else {
+                jsonString += "]}"; // desperate attempt
+            }
+        }
+
+        let parsedData;
+        try {
+            parsedData = JSON.parse(jsonString);
+        } catch (parseError) {
+            console.error("JSON Parse Error on string:", jsonString);
+            throw new Error('AIが返した回答の形式が崩れていました（JSONパースエラー）。もう一度お試しください。');
+        }
 
         return res.status(200).json(parsedData);
     } catch (error) {
