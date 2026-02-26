@@ -474,6 +474,7 @@ aiGenerateBtn.addEventListener('click', async () => {
 
         if (data.title && Array.isArray(data.answers)) {
             newTopicTitle.value = data.title;
+            if (data.notes) newTopicNotes.value = data.notes;
             // Merge or overwrite answers? Let's append to be safe or overwrite if empty
             if (pendingCustomAnswers.length === 0) {
                 pendingCustomAnswers = data.answers;
