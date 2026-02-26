@@ -336,13 +336,25 @@ function addPendingItem() {
 
 addTopicItemBtn.addEventListener('click', addPendingItem);
 
-[newTopicItemDisplay, newTopicItemHiragana, newTopicItemAlt].forEach(input => {
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.isComposing) {
-            e.preventDefault();
-            addPendingItem();
-        }
-    });
+newTopicItemDisplay.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        newTopicItemHiragana.focus();
+    }
+});
+
+newTopicItemHiragana.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        newTopicItemAlt.focus();
+    }
+});
+
+newTopicItemAlt.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.isComposing) {
+        e.preventDefault();
+        addPendingItem();
+    }
 });
 
 function renderPendingItems() {
