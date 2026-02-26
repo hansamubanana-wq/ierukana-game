@@ -495,10 +495,12 @@ function renderPendingItems() {
         const hiraganaTerm = answerSet[1];
 
         const span = document.createElement('span');
-        span.textContent = `${primaryTerm} (${hiraganaTerm})`;
+        let label = `${primaryTerm} (${hiraganaTerm})`;
         if (answerSet.length > 2) {
-            span.textContent += ` [+別解${answerSet.length - 2}]`;
+            const alts = answerSet.slice(2).join(', ');
+            label += ` | 別解: ${alts}`;
         }
+        span.textContent = label;
 
         const closeBtn = document.createElement('button');
         closeBtn.className = 'remove-tag-btn';
