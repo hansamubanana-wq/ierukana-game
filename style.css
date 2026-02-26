@@ -466,6 +466,29 @@ h1 {
     pointer-events: none;
 }
 
+.item-input-group {
+    background: #f8f9fa;
+    border: 2px dashed #dfe6e9;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-with-button .create-input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+}
+
 .added-items-container {
     background: var(--bg-color);
     border-radius: 12px;

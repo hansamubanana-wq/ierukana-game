@@ -32,7 +32,10 @@ const closeResultBtn = document.getElementById('close-result-btn');
 const openCreateModalBtn = document.getElementById('open-create-modal-btn');
 const createTopicModal = document.getElementById('create-topic-modal');
 const newTopicTitle = document.getElementById('new-topic-title');
-const newTopicItem = document.getElementById('new-topic-item');
+const newTopicItemDisplay = document.getElementById('new-topic-item-display');
+const newTopicItemHiragana = document.getElementById('new-topic-item-hiragana');
+const newTopicItemAlt = document.getElementById('new-topic-item-alt');
+const addTopicItemBtn = document.getElementById('add-topic-item-btn');
 const newTopicItemList = document.getElementById('new-topic-item-list');
 const newTopicCount = document.getElementById('new-topic-count');
 const createTopicError = document.getElementById('create-topic-error');
@@ -40,6 +43,7 @@ const saveTopicBtn = document.getElementById('save-topic-btn');
 const cancelTopicBtn = document.getElementById('cancel-topic-btn');
 
 let pendingCustomAnswers = [];
+let editingTopicId = null;
 
 // Initialize Portal List
 async function initPortal() {
@@ -63,14 +67,14 @@ async function initPortal() {
             btn.innerHTML = `
                 <div class="topic-card-header">
                     <h3>${topic.title}</h3>
-                    ${isCustom ? `<button class="delete-topic-btn" data-id="${topic.id}">🗑️</button>` : ''}
+                    ${isCustom ? `<div style="display:flex;gap:0.5rem;"><button class="edit-topic-btn" style="background:none;border:none;cursor:pointer;font-size:1.2rem;opacity:0.5;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" data-id="${topic.id}">✏️</button><button class="delete-topic-btn" data-id="${topic.id}">🗑️</button></div>` : ''}
                 </div>
                 <p>全 ${topic.answers.length} 問</p>
             `;
 
             // Click to play
             btn.addEventListener('click', (e) => {
-                if (e.target.closest('.delete-topic-btn')) return; // handled separately
+                if (e.target.closest('.delete-topic-btn') || e.target.closest('.edit-topic-btn')) return; // handled separately
                 initGame(topic);
             });
 
@@ -82,6 +86,12 @@ async function initPortal() {
                     if (confirm(`「${topic.title}」を削除しますか？`)) {
                         deleteCustomTopic(topic.id);
                     }
+                });
+
+                const editBtn = btn.querySelector('.edit-topic-btn');
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditModal(topic);
                 });
             }
 
@@ -267,34 +277,72 @@ backToPortalBtns.forEach(btn => {
 });
 
 // Create Topic Logic
-openCreateModalBtn.addEventListener('click', () => {
-    // Reset Form
-    newTopicTitle.value = '';
-    newTopicItem.value = '';
-    pendingCustomAnswers = [];
-    renderPendingItems();
+function openEditModal(topic = null) {
     createTopicError.textContent = '';
+    if (topic) {
+        editingTopicId = topic.id;
+        newTopicTitle.value = topic.title;
+        // Deep copy the answers
+        pendingCustomAnswers = JSON.parse(JSON.stringify(topic.answers));
+        document.querySelector('#create-topic-modal h2').textContent = 'お題を編集する';
+    } else {
+        editingTopicId = null;
+        newTopicTitle.value = '';
+        pendingCustomAnswers = [];
+        document.querySelector('#create-topic-modal h2').textContent = '新しいお題を作る';
+    }
+
+    newTopicItemDisplay.value = '';
+    newTopicItemHiragana.value = '';
+    newTopicItemAlt.value = '';
+
+    renderPendingItems();
     createTopicModal.classList.add('active');
     setTimeout(() => newTopicTitle.focus(), 100);
-});
+}
+
+openCreateModalBtn.addEventListener('click', () => openEditModal());
 
 cancelTopicBtn.addEventListener('click', () => {
     createTopicModal.classList.remove('active');
 });
 
-newTopicItem.addEventListener('keydown', (e) => {
-    // If user presses Enter without composing IME, or if it's Enter and the input is blurred, we catch it.
-    // simpler approach: look for 'Enter' and prevent default if there's text. (IME usually halts the pure Enter until resolved, but checking isComposing is safer).
-    if (e.key === 'Enter' && !e.isComposing) {
-        e.preventDefault();
-        const rawValue = newTopicItem.value.trim();
-        if (rawValue) {
-            // Add as an array containing the single term as its only valid answer representation
-            pendingCustomAnswers.push([rawValue]);
-            newTopicItem.value = '';
-            renderPendingItems();
-        }
+function addPendingItem() {
+    const displayVal = newTopicItemDisplay.value.trim();
+    const hiraganaVal = newTopicItemHiragana.value.trim();
+    const altVal = newTopicItemAlt.value.trim();
+
+    if (!displayVal || !hiraganaVal) {
+        createTopicError.textContent = '表示名とひらがなの両方を入力してください。';
+        return;
     }
+
+    createTopicError.textContent = '';
+    const answerSet = [displayVal, hiraganaVal];
+    if (altVal) {
+        // Split by comma, trim whitespace, remove empty strings
+        const alts = altVal.split(',').map(s => s.trim()).filter(s => s);
+        answerSet.push(...alts);
+    }
+
+    pendingCustomAnswers.push(answerSet);
+
+    newTopicItemDisplay.value = '';
+    newTopicItemHiragana.value = '';
+    newTopicItemAlt.value = '';
+    renderPendingItems();
+    newTopicItemDisplay.focus();
+}
+
+addTopicItemBtn.addEventListener('click', addPendingItem);
+
+[newTopicItemDisplay, newTopicItemHiragana, newTopicItemAlt].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.isComposing) {
+            e.preventDefault();
+            addPendingItem();
+        }
+    });
 });
 
 function renderPendingItems() {
@@ -306,9 +354,13 @@ function renderPendingItems() {
         li.className = 'item-tag';
         // The first element is the display/primary answer
         const primaryTerm = answerSet[0];
+        const hiraganaTerm = answerSet[1];
 
         const span = document.createElement('span');
-        span.textContent = primaryTerm;
+        span.textContent = `${primaryTerm} (${hiraganaTerm})`;
+        if (answerSet.length > 2) {
+            span.textContent += ` [+別解${answerSet.length - 2}]`;
+        }
 
         const closeBtn = document.createElement('button');
         closeBtn.className = 'remove-tag-btn';
@@ -343,14 +395,15 @@ saveTopicBtn.addEventListener('click', async () => {
     }
 
     const newTopic = {
-        id: 'custom_' + Date.now().toString(),
+        id: editingTopicId || ('custom_' + Date.now().toString()),
         title: title,
         answers: pendingCustomAnswers
     };
 
     try {
+        const method = editingTopicId ? 'PUT' : 'POST';
         const response = await fetch('/api/topics', {
-            method: 'POST',
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newTopic)
         });

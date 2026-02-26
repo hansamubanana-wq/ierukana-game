@@ -106,6 +106,26 @@ export default async function handler(req, res) {
             return res.status(201).json({ message: 'Topic added successfully', topic: newTopic });
         }
 
+        if (req.method === 'PUT') {
+            const updatedTopic = req.body;
+
+            if (!updatedTopic || !updatedTopic.id || !updatedTopic.title || !Array.isArray(updatedTopic.answers)) {
+                return res.status(400).json({ error: 'Invalid topic format' });
+            }
+
+            const topics = await getTopics();
+            const topicIndex = topics.findIndex(t => t.id === updatedTopic.id);
+
+            if (topicIndex === -1) {
+                return res.status(404).json({ error: 'Topic not found' });
+            }
+
+            topics[topicIndex] = updatedTopic;
+            await saveTopics(topics);
+
+            return res.status(200).json({ message: 'Topic updated successfully', topic: updatedTopic });
+        }
+
         if (req.method === 'DELETE') {
             const { id } = req.query; // in Vercel api, path params like /api/topics/[id].js OR query string /api/topics?id=xxx
 

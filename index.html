@@ -95,9 +95,16 @@
             <div class="create-topic-form">
                 <input type="text" id="new-topic-title" class="create-input" placeholder="お題のタイトル (例: 好きな果物)">
 
-                <div class="input-with-hint">
-                    <input type="text" id="new-topic-item" class="create-input" placeholder="答えを入力してEnterキーを押す">
-                    <span class="input-hint">Enterキーで追加</span>
+                <div class="item-input-group">
+                    <p class="items-label">答えを追加</p>
+                    <input type="text" id="new-topic-item-display" class="create-input" placeholder="表示名 (漢字など 例: 林檎)">
+                    <input type="text" id="new-topic-item-hiragana" class="create-input"
+                        placeholder="入力する言葉 (ひらがな 例: りんご)">
+                    <div class="input-with-button">
+                        <input type="text" id="new-topic-item-alt" class="create-input"
+                            placeholder="別解 (カンマ区切り、任意 例: リンゴ, アップル)">
+                        <button id="add-topic-item-btn" class="btn btn-secondary btn-sm">追加</button>
+                    </div>
                 </div>
 
                 <div class="added-items-container">
