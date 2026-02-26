@@ -93,6 +93,22 @@
             <p>タイトルと答えを入力しよう！エンターキーでどんどん答えを追加できるよ。</p>
 
             <div class="create-topic-form">
+                <div class="ai-generate-group item-input-group"
+                    style="border-color: rgba(255, 42, 133, 0.4); background: rgba(255, 42, 133, 0.05); box-shadow: inset 0 0 15px rgba(255,42,133,0.1);">
+                    <p class="items-label"
+                        style="display: flex; justify-content: space-between; align-items: center; color: #FF2A85;">
+                        <span style="font-weight:bold; letter-spacing:1px;">✨ AIにおまかせ生成</span>
+                        <span class="beta-badge">Pro機能</span>
+                    </p>
+                    <div class="input-with-button">
+                        <input type="text" id="ai-prompt-input" class="create-input"
+                            style="border-color: rgba(255,42,133,0.3);" placeholder="例: 歴代の総理大臣、ジブリ映画...">
+                        <button id="ai-generate-btn" class="btn btn-ai btn-sm">生成</button>
+                    </div>
+                </div>
+
+                <hr class="form-divider">
+
                 <input type="text" id="new-topic-title" class="create-input" placeholder="お題のタイトル (例: 好きな果物)">
 
                 <div class="item-input-group">

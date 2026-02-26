@@ -383,6 +383,46 @@ h1 {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+.btn-ai {
+    background: linear-gradient(135deg, #FF2A85, #9D00FF);
+    color: white;
+    box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4);
+    animation: aiGlow 2s infinite alternate;
+    border: none;
+}
+
+.btn-ai:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(157, 0, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+@keyframes aiGlow {
+    from {
+        box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4);
+    }
+
+    to {
+        box-shadow: 0 4px 25px rgba(255, 42, 133, 0.6);
+    }
+}
+
+.beta-badge {
+    background: linear-gradient(135deg, #FF2A85, #9D00FF);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.form-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    margin: 1.5rem 0;
+}
+
 .btn-text {
     background: none;
     color: var(--secondary-color);

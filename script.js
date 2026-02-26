@@ -45,6 +45,9 @@ const cancelTopicBtn = document.getElementById('cancel-topic-btn');
 let pendingCustomAnswers = [];
 let editingTopicId = null;
 
+const aiPromptInput = document.getElementById('ai-prompt-input');
+const aiGenerateBtn = document.getElementById('ai-generate-btn');
+
 // Initialize Portal List
 async function initPortal() {
     portalView.style.display = 'flex';
@@ -319,6 +322,7 @@ function openEditModal(topic = null) {
     newTopicItemDisplay.value = '';
     newTopicItemHiragana.value = '';
     newTopicItemAlt.value = '';
+    aiPromptInput.value = '';
 
     renderPendingItems();
     createTopicModal.classList.add('active');
@@ -378,6 +382,54 @@ newTopicItemAlt.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.isComposing) {
         e.preventDefault();
         addPendingItem();
+    }
+});
+
+aiGenerateBtn.addEventListener('click', async () => {
+    const promptText = aiPromptInput.value.trim();
+    if (!promptText) {
+        createTopicError.textContent = '自動生成するテーマ（例: ジブリ映画）を入力してください。';
+        return;
+    }
+
+    aiGenerateBtn.disabled = true;
+    const originalText = aiGenerateBtn.textContent;
+    aiGenerateBtn.textContent = '✨ 生成中...';
+    createTopicError.textContent = '';
+
+    try {
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: promptText })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || '生成に失敗しました');
+        }
+
+        if (data.title && Array.isArray(data.answers)) {
+            newTopicTitle.value = data.title;
+            // Merge or overwrite answers? Let's append to be safe or overwrite if empty
+            if (pendingCustomAnswers.length === 0) {
+                pendingCustomAnswers = data.answers;
+            } else {
+                pendingCustomAnswers.push(...data.answers);
+            }
+            renderPendingItems();
+            aiPromptInput.value = '';
+        } else {
+            throw new Error('予期しないデータ形式が返されました');
+        }
+
+    } catch (e) {
+        console.error(e);
+        createTopicError.textContent = '生成エラー: ' + e.message;
+    } finally {
+        aiGenerateBtn.disabled = false;
+        aiGenerateBtn.textContent = originalText;
     }
 });
 
