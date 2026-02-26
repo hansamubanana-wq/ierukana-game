@@ -1,15 +1,28 @@
-import { put, list } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
-const STORE_NAME = 'topics.json';
+const STORE_PREFIX = 'topics-store/';
+const LEGACY_STORE_NAME = 'topics.json';
 
 // Utility to get current topics from Blob
 async function getTopics() {
     try {
         const token = process.env.BLOB_READ_WRITE_TOKEN;
-        const { blobs } = await list({ maxResults: 1, prefix: STORE_NAME, token });
+
+        // Try the new timestamped store first
+        const { blobs } = await list({ prefix: STORE_PREFIX, token });
         if (blobs.length > 0) {
+            // Sort by uploadedAt descending to get the latest
+            blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+            const response = await fetch(blobs[0].url, { cache: 'no-store' });
+            if (!response.ok) throw new Error('Failed to fetch blob content from URL');
+            return await response.json();
+        }
+
+        // Fallback to legacy static name
+        const { blobs: legacyBlobs } = await list({ maxResults: 1, prefix: LEGACY_STORE_NAME, token });
+        if (legacyBlobs.length > 0) {
             // Bypass Vercel Edge CDN cache by appending a timestamp
-            const response = await fetch(blobs[0].url + '?_t=' + Date.now(), {
+            const response = await fetch(legacyBlobs[0].url + '?_t=' + Date.now(), {
                 cache: 'no-store',
                 headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
             });
@@ -19,8 +32,6 @@ async function getTopics() {
         return [];
     } catch (error) {
         console.error('Critical Error in getTopics:', error.message);
-        // Do NOT return a fallback array here in production. 
-        // Returning a fallback causes POST/DELETE to accidentally overwrite the entire database with the fallback data!
         throw error;
     }
 }
@@ -28,17 +39,25 @@ async function getTopics() {
 // Ensure the storage exists and is updated
 async function saveTopics(topicsData) {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
+    const newFileName = `${STORE_PREFIX}topics-${Date.now()}.json`;
+
     try {
-        await put(STORE_NAME, JSON.stringify(topicsData), {
+        await put(newFileName, JSON.stringify(topicsData), {
             access: 'public',
             addRandomSuffix: false,
-            allowOverwrite: true,
             token
         });
+
+        // Clean up old files to prevent infinite growth (keep only the newest 3)
+        const { blobs } = await list({ prefix: STORE_PREFIX, token });
+        blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        const blobsToDelete = blobs.slice(3).map(b => b.url);
+
+        if (blobsToDelete.length > 0) {
+            await del(blobsToDelete, { token });
+        }
     } catch (error) {
         console.error('Failed to save to Vercel Blob (Local Dev Crash Protection):', error);
-        // We catch here to prevent the 500 error from bubbling up immediately,
-        // allowing the frontend to at least receive a 201 success (even if ephemeral locally).
         if (process.env.VERCEL_ENV !== 'production') {
             console.log('Skipping actual save in non-production due to Blob SDK crash bug on Windows.');
             return;
