@@ -35,7 +35,7 @@ JSONの厳密なフォーマット:
 - 出力は純粋なJSON文字列のみを行ってください。マークダウンの \`\`\`json などの修飾は絶対に含めないでください。波括弧 {} で始まり波括弧で終わる必要があります。`;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -50,7 +50,7 @@ JSONの厳密なフォーマット:
         if (!response.ok) {
             const errorData = await response.text();
             console.error('Gemini API Error:', errorData);
-            throw new Error('Gemini APIリクエストに失敗しました');
+            throw new Error(`Gemini API Error (${response.status}): ${errorData}`);
         }
 
         const data = await response.json();
