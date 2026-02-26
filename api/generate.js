@@ -46,7 +46,7 @@ JSONの厳密なフォーマット:
 - 出力は純粋なJSON文字列のみを行ってください。マークダウンの \`\`\`json などの修飾は絶対に含めないでください。波括弧 {} で始まり波括弧で終わる必要があります。`;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
