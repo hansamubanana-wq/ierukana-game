@@ -33,6 +33,7 @@ const closeResultBtn = document.getElementById('close-result-btn');
 const openCreateModalBtn = document.getElementById('open-create-modal-btn');
 const createTopicModal = document.getElementById('create-topic-modal');
 const newTopicTitle = document.getElementById('new-topic-title');
+const newTopicNotes = document.getElementById('new-topic-notes');
 const newTopicItemDisplay = document.getElementById('new-topic-item-display');
 const newTopicItemHiragana = document.getElementById('new-topic-item-hiragana');
 const newTopicItemAlt = document.getElementById('new-topic-item-alt');
@@ -172,6 +173,11 @@ function initGame(data) {
 
     // Update UI text
     topicTitleEls.forEach(el => el.textContent = `お題：${data.title} (${data.answers.length}個)`);
+    const startNotesEl = document.getElementById('start-topic-notes');
+    if (startNotesEl) {
+        startNotesEl.textContent = data.notes || '';
+        startNotesEl.style.display = data.notes ? 'block' : 'none';
+    }
     timeDisplayEl.textContent = "00:00.00";
     updateStatusUI();
 
@@ -363,12 +369,14 @@ function openEditModal(topic = null) {
     if (topic) {
         editingTopicId = topic.id;
         newTopicTitle.value = topic.title;
+        newTopicNotes.value = topic.notes || '';
         // Deep copy the answers
         pendingCustomAnswers = JSON.parse(JSON.stringify(topic.answers));
         document.querySelector('#create-topic-modal h2').textContent = 'お題を編集する';
     } else {
         editingTopicId = null;
         newTopicTitle.value = '';
+        newTopicNotes.value = '';
         pendingCustomAnswers = [];
         document.querySelector('#create-topic-modal h2').textContent = '新しいお題を作る';
     }
@@ -541,6 +549,7 @@ saveTopicBtn.addEventListener('click', async () => {
     const newTopic = {
         id: editingTopicId || ('custom_' + Date.now().toString()),
         title: title,
+        notes: newTopicNotes.value.trim() || '',
         answers: pendingCustomAnswers
     };
 

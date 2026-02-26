@@ -79,6 +79,7 @@
         <div class="modal-content">
             <h2>準備はいい？</h2>
             <p id="start-topic-desc">お題：都道府県 (47個)</p>
+            <p id="start-topic-notes" style="font-size:0.85rem; opacity:0.8; white-space:pre-wrap;"></p>
             <p>※漢字、ひらがな、どちらでも正解になるよ！（※データ作成者によります）</p>
             <button id="start-btn" class="btn btn-primary btn-large">ゲームスタート！</button>
         </div>
@@ -125,6 +126,8 @@
                 <hr class="form-divider">
 
                 <input type="text" id="new-topic-title" class="create-input" placeholder="お題のタイトル (例: 好きな果物)">
+                <textarea id="new-topic-notes" class="create-input" placeholder="備考・注意事項 (任意、例: ‘「〜県」は不要です’)" rows="2"
+                    style="resize:vertical; min-height:2.5rem;"></textarea>
 
                 <div class="item-input-group">
                     <p class="items-label">答えを追加</p>
