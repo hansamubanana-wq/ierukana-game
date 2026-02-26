@@ -18,7 +18,8 @@ export default async function handler(req, res) {
     const systemPrompt = `あなたはクイズゲーム「言えるかな？ゲーム」のお題自動作成AIです。
 ユーザーからのお題リクエスト: 「${prompt}」
 
-このお題に関する代表的な答えをJSON形式の配列で10〜15個程度生成してください。
+このお題に関する代表的な答えを、できるだけ網羅的に（最大100個程度まで）JSON形式の配列で生成してください。
+「世界のすべての国」「日本の都道府県」など全体の数が決まっているものは可能な限りすべて挙げてください。
 JSONの厳密なフォーマット:
 {
   "title": "生成された美しいタイトル(例: 歴代の総理大臣)",
@@ -42,6 +43,7 @@ JSONの厳密なフォーマット:
                 contents: [{ parts: [{ text: systemPrompt }] }],
                 generationConfig: {
                     temperature: 0.7,
+                    maxOutputTokens: 8192,
                     responseMimeType: "application/json"
                 }
             })
