@@ -240,6 +240,7 @@ function endGame(reason) {
         resultTitle.textContent = '全問正解！';
         resultTitle.style.color = 'var(--secondary-color)';
         resultMessage.textContent = `素晴らしい！${currentData.title}をパーフェクトクリア！ クリアタイム: ${timeDisplayEl.textContent}`;
+        fireConfetti();
     } else if (reason === 'giveup') {
         resultTitle.textContent = 'ギブアップ';
         resultTitle.style.color = 'var(--giveup-text)';
@@ -248,7 +249,30 @@ function endGame(reason) {
 
     setTimeout(() => {
         resultModal.classList.add('active');
-    }, 1000);
+    }, 1500); // Give a bit more time for the initial confetti burst
+}
+
+function fireConfetti() {
+    var duration = 3000;
+    var animationEnd = Date.now() + duration;
+    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 2000 };
+
+    function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    var interval = setInterval(function () {
+        var timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+            return clearInterval(interval);
+        }
+
+        var particleCount = 50 * (timeLeft / duration);
+        // since particles fall down, start a bit higher than random
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
 }
 
 // Event Listeners
