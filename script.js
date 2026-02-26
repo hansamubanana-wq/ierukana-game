@@ -48,6 +48,32 @@ let editingTopicId = null;
 const aiPromptInput = document.getElementById('ai-prompt-input');
 const aiGenerateBtn = document.getElementById('ai-generate-btn');
 
+// --- Auth & Leaderboard Elements ---
+const authBtn = document.getElementById('auth-btn');
+const authModal = document.getElementById('auth-modal');
+const authTitle = document.getElementById('auth-title');
+const authUsername = document.getElementById('auth-username');
+const authPassword = document.getElementById('auth-password');
+const authError = document.getElementById('auth-error');
+const authActionBtn = document.getElementById('auth-action-btn');
+const authToggleBtn = document.getElementById('auth-toggle-btn');
+const authCancelBtn = document.getElementById('auth-cancel-btn');
+
+const mypageModal = document.getElementById('mypage-modal');
+const mypageUsernameDisplay = document.getElementById('mypage-username-display');
+const mypageTopicList = document.getElementById('mypage-topic-list');
+const logoutBtn = document.getElementById('logout-btn');
+const mypageCloseBtn = document.getElementById('mypage-close-btn');
+
+const leaderboardModal = document.getElementById('leaderboard-modal');
+const leaderboardTitle = document.getElementById('leaderboard-title');
+const leaderboardList = document.getElementById('leaderboard-list');
+const leaderboardCloseBtn = document.getElementById('leaderboard-close-btn');
+
+// State for Auth
+let currentUser = JSON.parse(localStorage.getItem('ierukana_user')) || null;
+let isLoginMode = true;
+
 // Initialize Portal List
 async function initPortal() {
     portalView.style.display = 'flex';
@@ -67,22 +93,39 @@ async function initPortal() {
 
             // Setup Card HTML (with delete button if custom)
             const isCustom = topic.id.startsWith('custom_');
+            const authorSpan = topic.authorName ? `<span style="font-size: 0.8rem; opacity: 0.8; display: block; margin-top: 0.2rem;">✍️ 作者: ${topic.authorName}</span>` : '';
+            const ownershipEdit = (isCustom && currentUser && topic.authorId === currentUser.id) ?
+                `<div style="display:flex;gap:0.5rem;"><button class="edit-topic-btn" style="background:none;border:none;cursor:pointer;font-size:1.2rem;opacity:0.5;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" data-id="${topic.id}">✏️</button><button class="delete-topic-btn" data-id="${topic.id}">🗑️</button></div>` : '';
+
             btn.innerHTML = `
                 <div class="topic-card-header">
-                    <h3>${topic.title}</h3>
-                    ${isCustom ? `<div style="display:flex;gap:0.5rem;"><button class="edit-topic-btn" style="background:none;border:none;cursor:pointer;font-size:1.2rem;opacity:0.5;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" data-id="${topic.id}">✏️</button><button class="delete-topic-btn" data-id="${topic.id}">🗑️</button></div>` : ''}
+                    <div>
+                        <h3>${topic.title}</h3>
+                        ${authorSpan}
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                        <button class="rank-topic-btn" style="background:none;border:none;cursor:pointer;font-size:1.5rem;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" data-id="${topic.id || topic.title}" title="ランキング">🏆</button>
+                        ${ownershipEdit}
+                    </div>
                 </div>
                 <p>全 ${topic.answers.length} 問</p>
             `;
 
             // Click to play
             btn.addEventListener('click', (e) => {
-                if (e.target.closest('.delete-topic-btn') || e.target.closest('.edit-topic-btn')) return; // handled separately
+                if (e.target.closest('.delete-topic-btn') || e.target.closest('.edit-topic-btn') || e.target.closest('.rank-topic-btn')) return; // handled separately
                 initGame(topic);
             });
 
+            // Ranking Logic
+            const rankBtn = btn.querySelector('.rank-topic-btn');
+            rankBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showLeaderboard(topic.id || topic.title, topic.title);
+            });
+
             // Delete Logic
-            if (isCustom) {
+            if (isCustom && currentUser && topic.authorId === currentUser.id) {
                 const delBtn = btn.querySelector('.delete-topic-btn');
                 delBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -244,6 +287,13 @@ function endGame(reason) {
         resultTitle.style.color = 'var(--secondary-color)';
         resultMessage.textContent = `素晴らしい！${currentData.title}をパーフェクトクリア！ クリアタイム: ${timeDisplayEl.textContent}`;
         fireConfetti();
+
+        // Submit to Leaderboard if logged in
+        if (currentUser) {
+            submitLeaderboard(currentData.id || currentData.title, timeDisplayEl.textContent);
+        } else {
+            resultMessage.textContent += ' (ログインするとランキングに登録できるよ！)';
+        }
     } else if (reason === 'giveup') {
         resultTitle.textContent = 'ギブアップ';
         resultTitle.style.color = 'var(--giveup-text)';
@@ -488,6 +538,11 @@ saveTopicBtn.addEventListener('click', async () => {
         answers: pendingCustomAnswers
     };
 
+    if (currentUser) {
+        newTopic.authorId = currentUser.id;
+        newTopic.authorName = currentUser.username;
+    }
+
     try {
         const method = editingTopicId ? 'PUT' : 'POST';
         const response = await fetch('/api/topics', {
@@ -507,5 +562,203 @@ saveTopicBtn.addEventListener('click', async () => {
         saveTopicBtn.disabled = false;
     }
 });
+// --- Auth and Leaderboard Logic ---
+updateAuthUI();
+
+function updateAuthUI() {
+    if (currentUser) {
+        authBtn.textContent = '🏠 マイページ';
+    } else {
+        authBtn.textContent = '🔑 ログイン';
+    }
+}
+
+authBtn.addEventListener('click', () => {
+    if (currentUser) {
+        showMyPage();
+    } else {
+        isLoginMode = true;
+        updateAuthModalUI();
+        authModal.classList.add('active');
+        authUsername.focus();
+    }
+});
+
+function updateAuthModalUI() {
+    authTitle.textContent = isLoginMode ? 'ログイン' : '新規登録';
+    authActionBtn.textContent = isLoginMode ? 'ログインする' : '登録する';
+    authToggleBtn.textContent = isLoginMode ? 'アカウントが無い方は 新規登録' : 'すでにアカウントをお持ちの方は ログイン';
+    authError.textContent = '';
+    authUsername.value = '';
+    authPassword.value = '';
+}
+
+authToggleBtn.addEventListener('click', () => {
+    isLoginMode = !isLoginMode;
+    updateAuthModalUI();
+});
+
+authCancelBtn.addEventListener('click', () => {
+    authModal.classList.remove('active');
+});
+
+authActionBtn.addEventListener('click', async () => {
+    const un = authUsername.value.trim();
+    const pw = authPassword.value.trim();
+    if (!un || !pw) {
+        authError.textContent = 'ユーザーネームとパスワードを入力してください。';
+        return;
+    }
+
+    authActionBtn.disabled = true;
+    authError.textContent = '通信中...';
+    try {
+        const action = isLoginMode ? 'login' : 'register';
+        const res = await fetch(`/api/auth?action=${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: un, password: pw })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'エラーが発生しました');
+
+        currentUser = data.user;
+        localStorage.setItem('ierukana_user', JSON.stringify(currentUser));
+        updateAuthUI();
+        authModal.classList.remove('active');
+        initPortal(); // Refresh to show editing rights etc.
+    } catch (e) {
+        authError.textContent = e.message;
+    } finally {
+        authActionBtn.disabled = false;
+    }
+});
+
+function showMyPage() {
+    mypageUsernameDisplay.textContent = currentUser.username;
+    mypageModal.classList.add('active');
+
+    // Fetch and filter user's topics
+    mypageTopicList.innerHTML = '<p>読み込み中...</p>';
+    fetch('/api/topics?_t=' + Date.now())
+        .then(res => res.json())
+        .then(topics => {
+            const myTopics = topics.filter(t => t.authorId === currentUser.id);
+            if (myTopics.length === 0) {
+                mypageTopicList.innerHTML = '<p>作成したお題はまだありません。</p>';
+                return;
+            }
+            mypageTopicList.innerHTML = '';
+            myTopics.forEach(t => {
+                const item = document.createElement('div');
+                item.className = 'topic-card';
+                item.style.padding = '1rem';
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong>${t.title}</strong>
+                        <div>
+                            <button class="btn btn-secondary btn-sm" onclick="openEditModal(${JSON.stringify(t).replace(/"/g, '&quot;')})">編集</button>
+                            <button class="btn btn-secondary btn-sm" onclick="if(confirm('削除しますか？')) deleteCustomTopic('${t.id}')">削除</button>
+                        </div>
+                    </div>
+                `;
+                mypageTopicList.appendChild(item);
+            });
+        })
+        .catch(() => mypageTopicList.innerHTML = '<p>読み込みエラー</p>');
+}
+
+mypageCloseBtn.addEventListener('click', () => mypageModal.classList.remove('active'));
+
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('ierukana_user');
+    currentUser = null;
+    mypageModal.classList.remove('active');
+    updateAuthUI();
+    initPortal(); // Refresh display
+});
+
+leaderboardCloseBtn.addEventListener('click', () => leaderboardModal.classList.remove('active'));
+
+async function showLeaderboard(topicId, topicTitle) {
+    leaderboardTitle.textContent = `${topicTitle} - ランキング`;
+    leaderboardList.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
+    leaderboardModal.classList.add('active');
+
+    try {
+        const res = await fetch(`/api/leaderboard?action=get&topicId=${encodeURIComponent(topicId)}&_t=` + Date.now(), { cache: 'no-store' });
+        const data = await res.json();
+        leaderboardList.innerHTML = '';
+
+        if (data.length === 0) {
+            leaderboardList.innerHTML = '<p style="text-align:center; opacity:0.7;">まだ記録がありません。一番乗りを目指そう！</p>';
+            return;
+        }
+
+        data.forEach((run, index) => {
+            const timeStr = formatMsAsTime(run.clearTime);
+            const dateStr = new Date(run.date).toLocaleDateString();
+            const li = document.createElement('li');
+            li.style.padding = '0.75rem';
+            li.style.background = 'rgba(255,255,255,0.05)';
+            li.style.borderRadius = '8px';
+            li.style.display = 'flex';
+            li.style.justifyContent = 'space-between';
+            li.style.alignItems = 'center';
+
+            let rankMedal = `${index + 1}位`;
+            if (index === 0) rankMedal = '🥇 1位';
+            if (index === 1) rankMedal = '🥈 2位';
+            if (index === 2) rankMedal = '🥉 3位';
+
+            li.innerHTML = `
+                <div><span style="font-weight:bold; color:var(--secondary-color); margin-right:0.5rem;">${rankMedal}</span> ${run.username}</div>
+                <div style="text-align:right;">
+                    <div style="font-weight:bold; font-family:monospace; font-size:1.1rem;">${timeStr}</div>
+                    <div style="font-size:0.7rem; opacity:0.6;">${dateStr}</div>
+                </div>
+            `;
+            leaderboardList.appendChild(li);
+        });
+    } catch (e) {
+        leaderboardList.innerHTML = '<p style="color:#ff5555; text-align:center;">ランキングの取得に失敗しました。</p>';
+    }
+}
+
+// Convert "MM:SS.ms" to milliseconds integer for storing
+function parseTimeStr(timeStr) {
+    const parts = timeStr.split(':');
+    const min = parseInt(parts[0], 10);
+    const secParts = parts[1].split('.');
+    const sec = parseInt(secParts[0], 10);
+    const ms10 = parseInt(secParts[1], 10); // it's hundreths (0-99) roughly
+    return (min * 60000) + (sec * 1000) + (ms10 * 10);
+}
+
+// Convert milliseconds integer back to "MM:SS.ms"
+function formatMsAsTime(elapsed) {
+    const minutes = Math.floor(elapsed / 60000);
+    const seconds = Math.floor((elapsed % 60000) / 1000);
+    const ms = Math.floor((elapsed % 1000) / 10);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+}
+
+async function submitLeaderboard(topicId, timeStr) {
+    const timeMs = parseTimeStr(timeStr);
+    try {
+        await fetch(`/api/leaderboard?action=submit&topicId=${encodeURIComponent(topicId)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, username: currentUser.username, clearTime: timeMs })
+        });
+        // Wait a small bit, then show leaderboard
+        setTimeout(() => {
+            showLeaderboard(topicId, currentData.title);
+        }, 1500);
+    } catch (e) {
+        console.error('Failed to submit score to leaderboard', e);
+    }
+}
+
 // Start initially with the portal screen
 initPortal();

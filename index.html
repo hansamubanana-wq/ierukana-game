@@ -20,7 +20,11 @@
 
     <!-- Portal Display -->
     <main id="portal-view" class="portal-container">
-        <h2>お題一覧（ポータル）</h2>
+        <div class="portal-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <h2>お題一覧（ポータル）</h2>
+            <button id="auth-btn" class="btn btn-secondary btn-small"
+                style="font-size: 0.9rem; padding: 0.5rem 1rem;">🔑 ログイン</button>
+        </div>
         <p>遊びたいお題をクリックしてスタート！</p>
         <div id="topic-list" class="topic-grid">
             <!-- Topic Cards injected here -->
@@ -136,6 +140,65 @@
             <div class="result-actions" style="margin-top: 1.5rem;">
                 <button id="save-topic-btn" class="btn btn-primary btn-full">保存してポータルに追加</button>
                 <button id="cancel-topic-btn" class="btn btn-text">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="auth-title">ログイン</h2>
+            <p id="auth-desc" style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
+                アカウントを作成して自分の記録を残そう！</p>
+            <div class="create-topic-form">
+                <input type="text" id="auth-username" class="create-input" placeholder="ユーザーネーム (例: tanaka123)">
+                <input type="password" id="auth-password" class="create-input" placeholder="パスワード"
+                    style="margin-top: 0.5rem;">
+                <p id="auth-error" class="error-text"></p>
+                <div class="result-actions" style="margin-top: 1.5rem;">
+                    <button id="auth-action-btn" class="btn btn-primary btn-full">ログインする</button>
+                    <button id="auth-toggle-btn" class="btn btn-text">新規登録はこちら</button>
+                    <button id="auth-cancel-btn" class="btn btn-text">キャンセル</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Page Modal -->
+    <div id="mypage-modal" class="modal">
+        <div class="modal-content">
+            <h2>マイページ</h2>
+            <p>ようこそ、<span id="mypage-username-display" style="font-weight:bold; color:#FF2A85;"></span> さん！</p>
+
+            <div class="added-items-container" style="margin-top: 1.5rem; max-height: 40vh; overflow-y: auto;">
+                <p class="items-label">作成したお題一覧:</p>
+                <div id="mypage-topic-list" class="topic-grid"
+                    style="grid-template-columns: 1fr; gap: 0.5rem; display: flex; flex-direction: column;">
+                    <!-- User's topics injected here -->
+                </div>
+            </div>
+
+            <div class="result-actions" style="margin-top: 1.5rem;">
+                <button id="logout-btn" class="btn btn-secondary btn-full">ログアウト</button>
+                <button id="mypage-close-btn" class="btn btn-text">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="leaderboard-title">ランキング</h2>
+
+            <div class="added-items-container" style="margin-top: 1.5rem; max-height: 40vh; overflow-y: auto;">
+                <ul id="leaderboard-list"
+                    style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <!-- Rankings injected here -->
+                </ul>
+            </div>
+
+            <div class="result-actions" style="margin-top: 1.5rem;">
+                <button id="leaderboard-close-btn" class="btn btn-secondary btn-full">閉じる</button>
             </div>
         </div>
     </div>
