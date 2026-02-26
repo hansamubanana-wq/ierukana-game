@@ -16,6 +16,7 @@ const scoreDisplayEl = document.getElementById('score-display');
 const answerInputEl = document.getElementById('answer-input');
 const answersGridEl = document.getElementById('answers-grid');
 const giveupBtn = document.getElementById('giveup-btn');
+const gameRankBtn = document.getElementById('game-rank-btn');
 
 // Modals
 const startModal = document.getElementById('start-modal');
@@ -334,6 +335,12 @@ answerInputEl.addEventListener('input', handleInput);
 giveupBtn.addEventListener('click', () => {
     if (confirm('本当にギブアップしますか？未解答の答えが表示されます。')) {
         endGame('giveup');
+    }
+});
+
+gameRankBtn.addEventListener('click', () => {
+    if (currentData) {
+        showLeaderboard(currentData.id || currentData.title, currentData.title);
     }
 });
 
