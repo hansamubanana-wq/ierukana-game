@@ -41,11 +41,20 @@
                 <span class="label">タイム</span>
                 <span class="value" id="time-display">00:00.00</span>
             </div>
-            <button id="game-rank-btn" class="btn btn-secondary btn-small"
-                style="font-size:1.2rem; padding:0.4rem 0.8rem; border-radius:12px;" title="ランキング">🏆</button>
             <div class="score-box">
                 <span class="label">正解数</span>
                 <span class="value" id="score-display">0 / 0</span>
+            </div>
+        </div>
+
+        <!-- Inline Leaderboard -->
+        <div id="game-leaderboard"
+            style="width:100%; max-width:600px; margin: 0.5rem auto; padding: 0.6rem 1rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+            <p style="margin:0 0 0.4rem 0; font-size:0.85rem; font-weight:bold; color:var(--secondary-color);">🏆 ランキング
+            </p>
+            <div id="game-leaderboard-list"
+                style="display:flex; flex-direction:column; gap:0.3rem; font-size:0.8rem; max-height: 120px; overflow-y: auto;">
+                <p style="opacity:0.5; margin:0;">読み込み中...</p>
             </div>
         </div>
 

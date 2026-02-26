@@ -16,7 +16,7 @@ const scoreDisplayEl = document.getElementById('score-display');
 const answerInputEl = document.getElementById('answer-input');
 const answersGridEl = document.getElementById('answers-grid');
 const giveupBtn = document.getElementById('giveup-btn');
-const gameRankBtn = document.getElementById('game-rank-btn');
+const gameLeaderboardList = document.getElementById('game-leaderboard-list');
 
 // Modals
 const startModal = document.getElementById('start-modal');
@@ -192,6 +192,9 @@ function initGame(data) {
     // Show start modal
     startModal.classList.add('active');
     resultModal.classList.remove('active');
+
+    // Load inline leaderboard
+    loadGameLeaderboard(data.id || data.title);
 }
 
 function startGame() {
@@ -335,12 +338,6 @@ answerInputEl.addEventListener('input', handleInput);
 giveupBtn.addEventListener('click', () => {
     if (confirm('本当にギブアップしますか？未解答の答えが表示されます。')) {
         endGame('giveup');
-    }
-});
-
-gameRankBtn.addEventListener('click', () => {
-    if (currentData) {
-        showLeaderboard(currentData.id || currentData.title, currentData.title);
     }
 });
 
@@ -731,6 +728,40 @@ async function showLeaderboard(topicId, topicTitle) {
         });
     } catch (e) {
         leaderboardList.innerHTML = '<p style="color:#ff5555; text-align:center;">ランキングの取得に失敗しました。</p>';
+    }
+}
+
+async function loadGameLeaderboard(topicId) {
+    gameLeaderboardList.innerHTML = '<p style="opacity:0.5; margin:0;">読み込み中...</p>';
+    try {
+        const res = await fetch(`/api/leaderboard?action=get&topicId=${encodeURIComponent(topicId)}&_t=` + Date.now(), { cache: 'no-store' });
+        const data = await res.json();
+        gameLeaderboardList.innerHTML = '';
+
+        if (data.length === 0) {
+            gameLeaderboardList.innerHTML = '<p style="opacity:0.5; margin:0;">まだ記録がありません。最初の記録を作ろう！</p>';
+            return;
+        }
+
+        const top5 = data.slice(0, 5);
+        top5.forEach((run, index) => {
+            const timeStr = formatMsAsTime(run.clearTime);
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:0.25rem 0.4rem; border-radius:6px; background:rgba(255,255,255,0.03);';
+
+            let medal = `${index + 1}.`;
+            if (index === 0) medal = '🥇';
+            if (index === 1) medal = '🥈';
+            if (index === 2) medal = '🥉';
+
+            row.innerHTML = `
+                <span><span style="margin-right:0.3rem;">${medal}</span>${run.username}</span>
+                <span style="font-family:monospace; font-weight:bold;">${timeStr}</span>
+            `;
+            gameLeaderboardList.appendChild(row);
+        });
+    } catch (e) {
+        gameLeaderboardList.innerHTML = '<p style="opacity:0.5; margin:0;">ランキング取得エラー</p>';
     }
 }
 
