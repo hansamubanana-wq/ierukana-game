@@ -112,19 +112,11 @@ export default async function handler(req, res) {
             if (!updatedTopic || !updatedTopic.id || !updatedTopic.title || !Array.isArray(updatedTopic.answers)) {
                 return res.status(400).json({ error: 'Invalid topic format' });
             }
-            const { authorId } = updatedTopic;
-
             const topics = await getTopics();
             const topicIndex = topics.findIndex(t => t.id === updatedTopic.id);
 
             if (topicIndex === -1) {
                 return res.status(404).json({ error: 'Topic not found' });
-            }
-
-            // Check ownership if topic has an author
-            const existingTopic = topics[topicIndex];
-            if (existingTopic.authorId && existingTopic.authorId !== authorId) {
-                return res.status(403).json({ error: 'You do not have permission to edit this topic.' });
             }
 
             topics[topicIndex] = updatedTopic;
