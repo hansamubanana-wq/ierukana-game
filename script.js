@@ -96,7 +96,7 @@ async function initPortal() {
             // Setup Card HTML (with delete button if custom)
             const isCustom = topic.id.startsWith('custom_');
             const authorSpan = topic.authorName ? `<span style="font-size: 0.8rem; opacity: 0.8; display: block; margin-top: 0.2rem;">✍️ 作者: ${topic.authorName}</span>` : '';
-            const ownershipEdit = (isCustom && currentUser && topic.authorId === currentUser.id) ?
+            const ownershipEdit = isCustom ?
                 `<div style="display:flex;gap:0.5rem;"><button class="edit-topic-btn" style="background:none;border:none;cursor:pointer;font-size:1.2rem;opacity:0.5;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5" data-id="${topic.id}">✏️</button><button class="delete-topic-btn" data-id="${topic.id}">🗑️</button></div>` : '';
 
             btn.innerHTML = `
@@ -127,7 +127,7 @@ async function initPortal() {
             });
 
             // Delete Logic
-            if (isCustom && currentUser && topic.authorId === currentUser.id) {
+            if (isCustom) {
                 const delBtn = btn.querySelector('.delete-topic-btn');
                 delBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -391,7 +391,16 @@ function openEditModal(topic = null) {
     setTimeout(() => newTopicTitle.focus(), 100);
 }
 
-openCreateModalBtn.addEventListener('click', () => openEditModal());
+openCreateModalBtn.addEventListener('click', () => {
+    if (!currentUser) {
+        isLoginMode = false;
+        updateAuthModalUI();
+        authError.textContent = '新しいお題を作るにはアカウントが必要です。';
+        authModal.classList.add('active');
+        return;
+    }
+    openEditModal();
+});
 
 cancelTopicBtn.addEventListener('click', () => {
     createTopicModal.classList.remove('active');
